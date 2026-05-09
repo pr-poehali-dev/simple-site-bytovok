@@ -1,336 +1,424 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 
-const CATALOG = [
+const CATALOG_ITEMS = [
   {
     id: 1,
     name: "Бытовка стандарт",
-    size: "6×2.4 м",
+    size: "24 м²",
+    rooms: 1,
     price: "68 000",
-    desc: "Металлический каркас, вагонка внутри, утеплитель 50 мм. Оптимально для строительной площадки.",
-    img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/a6491b85-4409-4a13-8dd6-3bfbae25858b.jpg",
-    tag: "Хит продаж",
+    img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/8b174e08-296e-4599-a565-7fd45a624de4.jpg",
+    category: "standard",
   },
   {
     id: 2,
-    name: "Бытовка-офис",
-    size: "6×3 м",
-    price: "95 000",
-    desc: "Ламинат, пластиковые окна, встроенная электрика. Идеально для прорабской или офиса.",
-    img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/6bcb1fe9-b20c-403f-b86e-a47b9e1ee1c0.jpg",
-    tag: "Популярное",
+    name: "Деревянная бытовка",
+    size: "18 м²",
+    rooms: 1,
+    price: "54 000",
+    img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/2a6db8e0-6c9c-4253-90f5-b1d4eae58231.jpg",
+    category: "wood",
   },
   {
     id: 3,
     name: "Склад-бытовка",
-    size: "9×3 м",
+    size: "36 м²",
+    rooms: 1,
     price: "120 000",
-    desc: "Усиленный каркас, раздвижные ворота 2.4×2 м, антикоррозийное покрытие. Для хранения техники.",
-    img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/9fa34a07-789a-41aa-aab2-37b4cea13d6a.jpg",
-    tag: "Новинка",
+    img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/6ae1aba4-864a-4742-becc-5361ec1aed0d.jpg",
+    category: "storage",
+  },
+  {
+    id: 4,
+    name: "Бытовка-офис",
+    size: "28 м²",
+    rooms: 2,
+    price: "95 000",
+    img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/98069637-0581-48d1-ad55-76ca06a7ac5c.jpg",
+    category: "office",
+  },
+  {
+    id: 5,
+    name: "Бытовка усиленная",
+    size: "32 м²",
+    rooms: 2,
+    price: "105 000",
+    img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/a6491b85-4409-4a13-8dd6-3bfbae25858b.jpg",
+    category: "standard",
   },
 ];
 
-const ADVANTAGES = [
-  { icon: "Zap", title: "Доставка за 3 дня", text: "Собственный автопарк, доставляем по всей России" },
-  { icon: "Shield", title: "Гарантия 3 года", text: "На каркас и кровлю, устраняем дефекты бесплатно" },
-  { icon: "Wrench", title: "Установка под ключ", text: "Бригада на месте — выравниваем, подключаем" },
-  { icon: "BadgeCheck", title: "Сертифицировано", text: "ГОСТ и ТУ, все документы в комплекте" },
+const FILTERS = [
+  { id: "all", label: "Все модели" },
+  { id: "standard", label: "Стандарт" },
+  { id: "wood", label: "Деревянные" },
+  { id: "office", label: "Офисные" },
+  { id: "storage", label: "Склады" },
 ];
 
-const GUARANTEES = [
-  { num: "3", unit: "года", label: "гарантия на конструкцию" },
-  { num: "500+", unit: "", label: "объектов сдано" },
-  { num: "24/7", unit: "", label: "поддержка клиентов" },
-  { num: "1", unit: "день", label: "монтаж на объекте" },
+const STEPS = [
+  { num: "01", title: "Выбор модели", time: "1 день", desc: "Выбираете подходящую бытовку из каталога или мы подбираем по вашим параметрам." },
+  { num: "02", title: "Договор и оплата", time: "1 день", desc: "Подписываем договор, фиксируем цену. Работаем официально, предоплата по договорённости." },
+  { num: "03", title: "Производство", time: "5–10 дней", desc: "Изготавливаем бытовку согласно выбранной комплектации и размерам на собственном производстве." },
+  { num: "04", title: "Доставка", time: "1–3 дня", desc: "Доставляем собственным транспортом, устанавливаем на площадке, выравниваем." },
+  { num: "05", title: "Сдача объекта", time: "1 день", desc: "Принимаете работу и подписываете акт. Передаём все документы и гарантийный талон." },
+];
+
+const TEAM = [
+  { name: "Андрей Смирнов", role: "Директор", img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/b530cc2f-fbaf-4e20-8e97-726d4cc92b7e.jpg" },
+  { name: "Игорь Колесов", role: "Главный инженер", img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/d9ebdd76-d46c-4a9f-b570-31cdff04cf9b.jpg" },
+  { name: "Сергей Петров", role: "Прораб", img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/b530cc2f-fbaf-4e20-8e97-726d4cc92b7e.jpg" },
+];
+
+const NAV_LINKS = [
+  { label: "Каталог", id: "catalog" },
+  { label: "О компании", id: "about" },
+  { label: "Этапы", id: "steps" },
+  { label: "Контакты", id: "contacts" },
 ];
 
 export default function Index() {
+  const [activeFilter, setActiveFilter] = useState("all");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeTeam, setActiveTeam] = useState(0);
 
   const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     setMobileOpen(false);
   };
 
+  const filtered = activeFilter === "all"
+    ? CATALOG_ITEMS
+    : CATALOG_ITEMS.filter(i => i.category === activeFilter);
+
   return (
-    <div className="font-sans bg-[#F7F5F2] text-[#1E1A16] min-h-screen">
-      {/* NAV */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#F7F5F2]/90 backdrop-blur-sm border-b border-[#E8E4DF]">
+    <div className="font-sans bg-white text-[#1a1a1a] min-h-screen">
+
+      {/* TOP BAR */}
+      <div className="bg-[#2d2d2d] text-white text-xs py-2 hidden md:block">
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
+          <div className="flex items-center gap-6 text-[#aaa]">
+            <span className="flex items-center gap-1.5"><Icon name="MapPin" size={12} />Москва, ул. Производственная, 12</span>
+            <span className="flex items-center gap-1.5"><Icon name="Mail" size={12} />info@bytovki.ru</span>
+          </div>
+          <div className="flex items-center gap-6 text-[#aaa]">
+            <span className="flex items-center gap-1.5"><Icon name="Phone" size={12} />+7 (800) 123-45-67</span>
+            <span className="text-[#4CAF50]">Пн–Пт 9:00–18:00</span>
+          </div>
+        </div>
+      </div>
+
+      {/* NAVBAR */}
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="#" className="font-display text-xl font-semibold tracking-wide uppercase text-[#1E1A16]">
-            Бытовки<span className="text-[#C8963E]">Про</span>
+          <a href="#" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#4CAF50] flex items-center justify-center rounded">
+              <Icon name="Home" size={16} className="text-white" />
+            </div>
+            <span className="font-display font-semibold text-lg uppercase tracking-wide">БытовкиПро</span>
           </a>
-          <nav className="hidden md:flex gap-8">
-            {[
-              { label: "Главная", id: "hero" },
-              { label: "Преимущества", id: "advantages" },
-              { label: "Каталог", id: "catalog" },
-              { label: "Гарантии", id: "guarantees" },
-              { label: "Контакты", id: "contacts" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                className="text-sm font-medium text-[#6B6259] hover:text-[#C8963E] transition-colors"
-              >
-                {item.label}
+          <nav className="hidden md:flex items-center gap-8">
+            {NAV_LINKS.map(l => (
+              <button key={l.id} onClick={() => scrollTo(l.id)} className="text-sm font-medium text-[#444] hover:text-[#4CAF50] transition-colors">
+                {l.label}
               </button>
             ))}
           </nav>
           <button
             onClick={() => scrollTo("contacts")}
-            className="hidden md:block bg-[#C8963E] text-white text-sm font-semibold px-5 py-2.5 hover:bg-[#A07830] transition-colors"
+            className="hidden md:flex items-center gap-2 bg-[#1a1a1a] text-white text-sm font-semibold px-5 py-2.5 hover:bg-[#4CAF50] transition-colors rounded-full"
           >
-            Получить прайс
+            Заказать звонок
           </button>
-          <button
-            className="md:hidden p-2"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
+          <button className="md:hidden p-2" onClick={() => setMobileOpen(!mobileOpen)}>
             <Icon name={mobileOpen ? "X" : "Menu"} size={22} />
           </button>
         </div>
         {mobileOpen && (
-          <div className="md:hidden bg-[#F7F5F2] border-t border-[#E8E4DF] px-6 py-4 flex flex-col gap-4">
-            {[
-              { label: "Главная", id: "hero" },
-              { label: "Преимущества", id: "advantages" },
-              { label: "Каталог", id: "catalog" },
-              { label: "Гарантии", id: "guarantees" },
-              { label: "Контакты", id: "contacts" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                className="text-left text-base font-medium text-[#1E1A16] hover:text-[#C8963E] transition-colors"
-              >
-                {item.label}
-              </button>
+          <div className="md:hidden bg-white border-t px-6 py-4 flex flex-col gap-4">
+            {NAV_LINKS.map(l => (
+              <button key={l.id} onClick={() => scrollTo(l.id)} className="text-left font-medium hover:text-[#4CAF50]">{l.label}</button>
             ))}
           </div>
         )}
       </header>
 
       {/* HERO */}
-      <section id="hero" className="pt-16 min-h-screen flex items-center">
-        <div className="max-w-6xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
-          <div className="animate-fade-in-left">
-            <p className="text-[#C8963E] font-display text-sm tracking-[0.2em] uppercase mb-4">
-              Производство и продажа
-            </p>
-            <h1 className="font-display text-5xl md:text-6xl font-semibold leading-tight uppercase mb-6 text-[#1E1A16]">
-              Бытовки<br />
-              <span className="text-[#C8963E]">под ключ</span>
-            </h1>
-            <p className="text-lg text-[#6B6259] leading-relaxed mb-8 max-w-md">
-              Производим и доставляем бытовки для строительных площадок, дач и складов. Быстро, надёжно, с гарантией 3 года.
-            </p>
-            <div className="flex flex-wrap gap-4">
+      <section id="hero" className="bg-white pt-10 pb-16">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h1 className="font-display text-5xl md:text-6xl font-semibold leading-tight mb-6">
+            Бытовки{" "}
+            <img
+              src="https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/8b174e08-296e-4599-a565-7fd45a624de4.jpg"
+              className="w-14 h-14 rounded-full object-cover inline-block align-middle border-2 border-[#4CAF50] mx-1"
+              alt=""
+            />
+            под ключ<br />по всей России
+          </h1>
+          <button
+            onClick={() => scrollTo("catalog")}
+            className="inline-flex items-center gap-2 bg-[#4CAF50] text-white font-semibold px-8 py-4 rounded-full text-base hover:bg-[#388E3C] transition-colors"
+          >
+            Перейти в каталог
+            <Icon name="ArrowRight" size={18} />
+          </button>
+        </div>
+
+        {/* INFO CARDS */}
+        <div className="max-w-6xl mx-auto px-6 mt-12 grid md:grid-cols-3 gap-4">
+          <div className="bg-[#2d2d2d] text-white rounded-2xl p-6">
+            <p className="text-[#4CAF50] font-semibold text-sm mb-2">Скидка 13%</p>
+            <p className="font-semibold text-lg leading-snug mb-2">Скидки при заказе от 2 бытовок</p>
+            <p className="text-[#aaa] text-sm">Подберём выгодные условия, проконсультируем по комплектациям</p>
+          </div>
+          <div className="rounded-2xl overflow-hidden relative aspect-video md:aspect-auto">
+            <img src="https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/a6491b85-4409-4a13-8dd6-3bfbae25858b.jpg" className="w-full h-full object-cover" alt="" />
+          </div>
+          <div className="bg-[#F7F5F2] rounded-2xl p-6">
+            <p className="text-[#4CAF50] font-semibold text-sm mb-2">Рассрочка 0%</p>
+            <p className="font-semibold text-lg leading-snug mb-2">Бытовка в рассрочку на 12 месяцев</p>
+            <p className="text-[#777] text-sm">Выбираем выгодные условия с нулевой переплатой</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <p className="text-[#4CAF50] text-sm font-semibold uppercase tracking-widest mb-4">О компании</p>
+          <p className="text-xl md:text-2xl text-[#444] leading-relaxed max-w-3xl mb-12">
+            Компания «БытовкиПро» работает с 2012 года. Производим, доставляем и устанавливаем бытовки для строительных площадок, дачных участков и коммерческих объектов по всей России.
+          </p>
+          <div className="grid grid-cols-3 md:grid-cols-4 gap-8 items-center">
+            {[
+              { num: "12", unit: "лет", label: "на рынке" },
+              { num: "500+", unit: "", label: "сданных объектов" },
+              { num: "3000+", unit: "", label: "доставленных бытовок" },
+            ].map((s) => (
+              <div key={s.label}>
+                <p className="font-display text-4xl md:text-5xl font-semibold text-[#1a1a1a]">
+                  {s.num}<span className="text-2xl ml-1 text-[#4CAF50]">{s.unit}</span>
+                </p>
+                <p className="text-[#777] text-sm mt-1">{s.label}</p>
+              </div>
+            ))}
+            <div className="flex justify-end">
               <button
                 onClick={() => scrollTo("catalog")}
-                className="bg-[#C8963E] text-white font-semibold px-8 py-4 hover:bg-[#A07830] transition-colors text-base"
+                className="w-14 h-14 bg-[#4CAF50] rounded-full flex items-center justify-center hover:bg-[#388E3C] transition-colors"
               >
-                Смотреть каталог
+                <Icon name="ArrowUpRight" size={22} className="text-white" />
               </button>
-              <button
-                onClick={() => scrollTo("contacts")}
-                className="border border-[#1E1A16] text-[#1E1A16] font-semibold px-8 py-4 hover:bg-[#1E1A16] hover:text-white transition-colors text-base"
-              >
-                Рассчитать стоимость
-              </button>
-            </div>
-          </div>
-
-          {/* Banner 4:3 */}
-          <div className="animate-fade-in relative">
-            <div className="aspect-[4/3] overflow-hidden">
-              <img
-                src="https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/a6491b85-4409-4a13-8dd6-3bfbae25858b.jpg"
-                alt="Бытовка стандарт"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="absolute -bottom-4 -left-4 bg-[#C8963E] text-white px-6 py-4">
-              <p className="font-display text-3xl font-semibold">от 68 000 ₽</p>
-              <p className="text-sm opacity-90">без предоплаты</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ADVANTAGES */}
-      <section id="advantages" className="bg-white py-24">
+      {/* WE OFFER — green band */}
+      <section className="bg-[#4CAF50] py-14 overflow-hidden">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-14">
-            <p className="text-[#C8963E] font-display text-sm tracking-[0.2em] uppercase mb-3">Почему мы</p>
-            <h2 className="font-display text-4xl font-semibold uppercase">Наши преимущества</h2>
+          <div className="flex items-center gap-4 mb-8">
+            <h2 className="font-display text-4xl font-semibold text-white">Мы предлагаем</h2>
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+              <Icon name="ArrowLeft" size={16} className="text-white" />
+            </div>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {ADVANTAGES.map((a) => (
-              <div key={a.title} className="group">
-                <div className="w-12 h-12 bg-[#F7F5F2] flex items-center justify-center mb-4 group-hover:bg-[#C8963E] transition-colors">
-                  <Icon name={a.icon} size={22} className="text-[#C8963E] group-hover:text-white transition-colors" />
+          <div className="flex gap-6 overflow-x-auto pb-2">
+            {[
+              { label: "Строительные", img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/8b174e08-296e-4599-a565-7fd45a624de4.jpg" },
+              { label: "Деревянные", img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/2a6db8e0-6c9c-4253-90f5-b1d4eae58231.jpg" },
+              { label: "Складские", img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/6ae1aba4-864a-4742-becc-5361ec1aed0d.jpg" },
+              { label: "Офисные", img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/98069637-0581-48d1-ad55-76ca06a7ac5c.jpg" },
+              { label: "Усиленные", img: "https://cdn.poehali.dev/projects/21ee6267-32ce-4a66-b293-2efa87c1f6a6/files/a6491b85-4409-4a13-8dd6-3bfbae25858b.jpg" },
+            ].map((cat) => (
+              <button key={cat.label} className="flex-shrink-0 flex flex-col items-center gap-2 group" onClick={() => scrollTo("catalog")}>
+                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/30 group-hover:border-white transition-colors">
+                  <img src={cat.img} alt={cat.label} className="w-full h-full object-cover" />
                 </div>
-                <h3 className="font-display font-semibold text-lg uppercase mb-2">{a.title}</h3>
-                <p className="text-[#6B6259] text-sm leading-relaxed">{a.text}</p>
-              </div>
+                <p className="text-white text-sm font-medium text-center">{cat.label}</p>
+              </button>
             ))}
           </div>
         </div>
       </section>
 
       {/* CATALOG */}
-      <section id="catalog" className="py-24 bg-[#F7F5F2]">
+      <section id="catalog" className="py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-14">
-            <p className="text-[#C8963E] font-display text-sm tracking-[0.2em] uppercase mb-3">Выбор</p>
-            <h2 className="font-display text-4xl font-semibold uppercase">Каталог бытовок</h2>
+          <h2 className="font-display text-4xl font-semibold text-center mb-2">Ознакомьтесь<br />с нашими моделями</h2>
+          <p className="text-center text-[#777] mb-10">Широкий выбор бытовок — от стандартных до премиальных</p>
+
+          <div className="flex flex-wrap gap-2 mb-10 justify-center">
+            {FILTERS.map(f => (
+              <button
+                key={f.id}
+                onClick={() => setActiveFilter(f.id)}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-colors border ${
+                  activeFilter === f.id
+                    ? "bg-[#4CAF50] text-white border-[#4CAF50]"
+                    : "bg-white text-[#444] border-[#e0e0e0] hover:border-[#4CAF50] hover:text-[#4CAF50]"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {CATALOG.map((item) => (
-              <div key={item.id} className="bg-white group cursor-pointer hover:shadow-lg transition-shadow">
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {filtered.slice(0, 4).map(item => (
+              <div key={item.id} className="group cursor-pointer rounded-2xl overflow-hidden bg-[#F7F5F2] hover:shadow-lg transition-shadow">
                 <div className="aspect-[4/3] overflow-hidden relative">
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <span className="absolute top-4 left-4 bg-[#C8963E] text-white text-xs font-semibold px-3 py-1 font-display uppercase tracking-wider">
-                    {item.tag}
-                  </span>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="font-display font-semibold text-xl uppercase">{item.name}</h3>
-                    <span className="text-[#C8963E] text-sm font-medium bg-[#F7F5F2] px-2 py-1 whitespace-nowrap ml-2">
+                  <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute bottom-3 left-3 flex gap-2">
+                    <span className="bg-white/90 text-[#1a1a1a] text-xs font-semibold px-3 py-1 rounded-full">
                       {item.size}
                     </span>
+                    <span className="bg-white/90 text-[#1a1a1a] text-xs font-semibold px-3 py-1 rounded-full">
+                      {item.rooms === 1 ? "1 помещение" : `${item.rooms} помещения`}
+                    </span>
                   </div>
-                  <p className="text-[#6B6259] text-sm leading-relaxed mb-5">{item.desc}</p>
-                  <div className="flex items-center justify-between">
-                    <p className="font-display font-semibold text-2xl">{item.price} ₽</p>
-                    <button className="bg-[#1E1A16] text-white text-sm font-semibold px-5 py-2.5 hover:bg-[#C8963E] transition-colors">
-                      Заказать
-                    </button>
-                  </div>
+                  <button className="absolute top-3 right-3 w-9 h-9 bg-[#4CAF50] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Icon name="ArrowUpRight" size={16} className="text-white" />
+                  </button>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-base mb-1">{item.name}</h3>
+                  <p className="font-display text-xl font-semibold text-[#4CAF50]">{item.price} ₽</p>
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* GUARANTEES */}
-      <section id="guarantees" className="bg-[#1E1A16] py-24 text-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-14">
-            <p className="text-[#C8963E] font-display text-sm tracking-[0.2em] uppercase mb-3">Уверенность</p>
-            <h2 className="font-display text-4xl font-semibold uppercase">Наши гарантии</h2>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {GUARANTEES.map((g) => (
-              <div key={g.label} className="border-t border-[#3A3530] pt-6">
-                <p className="font-display text-5xl font-semibold text-[#C8963E]">
-                  {g.num}<span className="text-2xl ml-1">{g.unit}</span>
-                </p>
-                <p className="text-[#A8A09A] text-sm mt-2 leading-snug">{g.label}</p>
+            <div className="rounded-2xl bg-[#F7F5F2] flex flex-col items-center justify-center p-8 gap-4 min-h-[200px]">
+              <div className="w-14 h-14 bg-[#4CAF50] rounded-full flex items-center justify-center">
+                <Icon name="ArrowUpRight" size={24} className="text-white" />
               </div>
-            ))}
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { icon: "FileCheck", title: "Договор", text: "Работаем официально по договору купли-продажи. Все условия прописаны заранее." },
-              { icon: "Hammer", title: "Бесплатный ремонт", text: "Любые производственные дефекты устраняем за наш счёт в течение 3 лет." },
-              { icon: "RotateCcw", title: "Возврат и замена", text: "Если бытовка не подошла при получении — заменяем или возвращаем деньги." },
-            ].map((g) => (
-              <div key={g.title} className="bg-[#2A2520] p-6">
-                <Icon name={g.icon} size={24} className="text-[#C8963E] mb-4" />
-                <h3 className="font-display font-semibold text-lg uppercase mb-2">{g.title}</h3>
-                <p className="text-[#A8A09A] text-sm leading-relaxed">{g.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CONTACTS */}
-      <section id="contacts" className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-start">
-          <div>
-            <p className="text-[#C8963E] font-display text-sm tracking-[0.2em] uppercase mb-3">Связь</p>
-            <h2 className="font-display text-4xl font-semibold uppercase mb-6">Контакты</h2>
-            <p className="text-[#6B6259] leading-relaxed mb-10 max-w-sm">
-              Оставьте заявку — менеджер свяжется в течение 15 минут и подберёт нужную модель.
-            </p>
-            <div className="flex flex-col gap-5">
-              {[
-                { icon: "Phone", text: "+7 (800) 123-45-67", label: "Бесплатный звонок" },
-                { icon: "MapPin", text: "Москва, ул. Производственная, 12", label: "Шоурум и склад" },
-                { icon: "Clock", text: "Пн–Пт 9:00–19:00, Сб 10:00–16:00", label: "График работы" },
-              ].map((c) => (
-                <div key={c.label} className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-[#F7F5F2] flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Icon name={c.icon} size={18} className="text-[#C8963E]" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#1E1A16]">{c.text}</p>
-                    <p className="text-sm text-[#6B6259]">{c.label}</p>
-                  </div>
-                </div>
-              ))}
+              <p className="font-semibold text-center text-[#1a1a1a]">Перейти<br />в каталог</p>
+              <button onClick={() => scrollTo("contacts")} className="text-sm text-[#4CAF50] font-medium hover:underline">
+                Смотреть все →
+              </button>
             </div>
           </div>
-          <div className="bg-[#F7F5F2] p-8">
-            <h3 className="font-display text-xl font-semibold uppercase mb-6">Оставить заявку</h3>
-            <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
-              <div>
-                <label className="text-sm font-medium text-[#6B6259] block mb-1.5">Ваше имя</label>
-                <input
-                  type="text"
-                  placeholder="Иван Иванов"
-                  className="w-full bg-white border border-[#E8E4DF] px-4 py-3 text-[#1E1A16] placeholder:text-[#B0A89E] focus:outline-none focus:border-[#C8963E] transition-colors"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[#6B6259] block mb-1.5">Телефон</label>
-                <input
-                  type="tel"
-                  placeholder="+7 (___) ___-__-__"
-                  className="w-full bg-white border border-[#E8E4DF] px-4 py-3 text-[#1E1A16] placeholder:text-[#B0A89E] focus:outline-none focus:border-[#C8963E] transition-colors"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-[#6B6259] block mb-1.5">Что интересует?</label>
-                <textarea
-                  rows={3}
-                  placeholder="Размер, количество, условия доставки..."
-                  className="w-full bg-white border border-[#E8E4DF] px-4 py-3 text-[#1E1A16] placeholder:text-[#B0A89E] focus:outline-none focus:border-[#C8963E] transition-colors resize-none"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-[#C8963E] text-white font-semibold py-4 hover:bg-[#A07830] transition-colors font-display uppercase tracking-wide"
+        </div>
+      </section>
+
+      {/* STEPS */}
+      <section id="steps" className="py-20 bg-[#F7F5F2]">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="font-display text-4xl font-semibold mb-12">Этапы<br />работы</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {STEPS.map((s, i) => (
+              <div
+                key={s.num}
+                className={`rounded-2xl p-6 ${i === 3 ? "bg-[#4CAF50] text-white" : "bg-white"}`}
               >
-                Отправить заявку
-              </button>
-              <p className="text-xs text-[#B0A89E] text-center">
-                Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`text-sm font-semibold ${i === 3 ? "text-white/70" : "text-[#aaa]"}`}>{s.num}</span>
+                  <span className={`text-xs px-3 py-1 rounded-full font-medium ${i === 3 ? "bg-white/20 text-white" : "bg-[#F7F5F2] text-[#555]"}`}>
+                    {s.time}
+                  </span>
+                </div>
+                <h3 className={`font-semibold text-lg mb-3 ${i === 3 ? "text-white" : "text-[#1a1a1a]"}`}>{s.title}</h3>
+                <p className={`text-sm leading-relaxed ${i === 3 ? "text-white/80" : "text-[#777]"}`}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TEAM */}
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="font-display text-4xl font-semibold mb-12">Команда</h2>
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="flex gap-4 flex-wrap">
+              {TEAM.map((m, i) => (
+                <button
+                  key={m.name}
+                  onClick={() => setActiveTeam(i)}
+                  className={`rounded-full overflow-hidden transition-all ${
+                    activeTeam === i ? "w-32 h-32 ring-4 ring-[#4CAF50]" : "w-24 h-24 opacity-60 hover:opacity-80"
+                  }`}
+                >
+                  <img src={m.img} alt={m.name} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+            <div>
+              <p className="text-[#4CAF50] text-sm font-semibold uppercase tracking-widest mb-2">{TEAM[activeTeam].role}</p>
+              <h3 className="font-display text-3xl font-semibold mb-4">{TEAM[activeTeam].name}</h3>
+              <p className="text-[#777] leading-relaxed text-sm">
+                Опытный специалист с профильным образованием. Контролирует качество производства, ведёт переговоры с клиентами и обеспечивает соблюдение сроков на каждом этапе.
               </p>
-            </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA BANNER */}
+      <section className="bg-[#4CAF50] py-20 mx-4 md:mx-6 rounded-3xl mb-6">
+        <div className="max-w-6xl mx-auto px-8 flex flex-col md:flex-row items-center justify-between gap-8">
+          <h2 className="font-display text-5xl md:text-6xl font-semibold text-white leading-tight">
+            Поработаем<br />вместе?
+          </h2>
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center border-2 border-white/30">
+              <Icon name="ArrowUpRight" size={32} className="text-white" />
+            </div>
+            <button
+              onClick={() => scrollTo("contacts")}
+              className="bg-white text-[#1a1a1a] font-semibold px-8 py-3 rounded-full hover:bg-[#F7F5F2] transition-colors"
+            >
+              Заказать звонок
+            </button>
           </div>
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#1E1A16] text-[#A8A09A] py-8">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-          <p className="font-display font-semibold text-white uppercase tracking-wide">
-            Бытовки<span className="text-[#C8963E]">Про</span>
-          </p>
-          <p>© 2024 БытовкиПро. Все права защищены.</p>
-          <a href="#" className="hover:text-white transition-colors">Политика конфиденциальности</a>
+      <footer id="contacts" className="bg-[#1a1a1a] text-white pt-14 pb-8">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-3 gap-12 mb-12">
+            <div>
+              <p className="font-display font-semibold text-lg uppercase mb-4">
+                Бытовки<span className="text-[#4CAF50]">Про</span>
+              </p>
+              <div className="flex flex-col gap-3 text-[#aaa] text-sm">
+                {NAV_LINKS.map(l => (
+                  <button key={l.id} onClick={() => scrollTo(l.id)} className="text-left hover:text-white transition-colors">{l.label}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold mb-4">Свяжитесь с нами</p>
+              <div className="flex flex-col gap-3 text-[#aaa] text-sm mb-6">
+                <p className="flex items-center gap-2"><Icon name="Mail" size={14} />info@bytovki.ru</p>
+                <p className="flex items-center gap-2"><Icon name="Phone" size={14} />+7 (800) 123-45-67</p>
+                <p className="flex items-center gap-2"><Icon name="MapPin" size={14} />Москва, ул. Производственная, 12</p>
+              </div>
+              <p className="font-semibold mb-3 text-sm">Быстрая заявка</p>
+              <form className="flex flex-col gap-3" onSubmit={(e) => e.preventDefault()}>
+                <input type="text" placeholder="Ваше имя" className="bg-[#2d2d2d] border-none px-4 py-2.5 text-sm text-white placeholder:text-[#666] focus:outline-none focus:ring-1 focus:ring-[#4CAF50] rounded-lg" />
+                <input type="tel" placeholder="+7 (___) ___-__-__" className="bg-[#2d2d2d] border-none px-4 py-2.5 text-sm text-white placeholder:text-[#666] focus:outline-none focus:ring-1 focus:ring-[#4CAF50] rounded-lg" />
+                <button type="submit" className="bg-[#4CAF50] text-white text-sm font-semibold py-2.5 rounded-lg hover:bg-[#388E3C] transition-colors">
+                  Отправить
+                </button>
+              </form>
+            </div>
+            <div>
+              <p className="font-semibold mb-4">Мы в соцсетях</p>
+              <div className="flex gap-3">
+                {["MessageCircle", "Send", "Youtube", "Instagram"].map(icon => (
+                  <div key={icon} className="w-10 h-10 bg-[#2d2d2d] rounded-full flex items-center justify-center hover:bg-[#4CAF50] transition-colors cursor-pointer">
+                    <Icon name={icon} size={16} className="text-white" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-[#333] pt-6 flex flex-col md:flex-row justify-between text-[#666] text-xs gap-2">
+            <p>© 2012–2024 БытовкиПро</p>
+            <a href="#" className="hover:text-white transition-colors">Политика конфиденциальности</a>
+          </div>
         </div>
       </footer>
     </div>
